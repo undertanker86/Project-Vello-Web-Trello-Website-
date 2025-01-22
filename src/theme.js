@@ -3,6 +3,11 @@ import { orange, cyan, blue, lightBlue } from '@mui/material/colors'
 
 // Create a theme instance.
 const theme = extendTheme({
+  controllCustomer:{
+    topBarHeight: '48px',
+    boardBarHeight: '58px',
+  },
+
   colorSchemes: {
     light: {
       palette: {

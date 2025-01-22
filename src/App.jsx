@@ -1,10 +1,5 @@
-import Button from '@mui/material/Button'
 
-import HomeIcon from '@mui/icons-material/Home'
-import Typography from '@mui/material/Typography'
 import { useColorScheme } from '@mui/material/styles'
-
-import useMediaQuery from '@mui/material/useMediaQuery'
 
 import InputLabel from '@mui/material/InputLabel'
 import MenuItem from '@mui/material/MenuItem'
@@ -14,6 +9,9 @@ import Select from '@mui/material/Select'
 import LightModeIcon from '@mui/icons-material/LightMode'
 import DarkModeIcon from '@mui/icons-material/DarkMode'
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt'
+
+import Container from '@mui/material/Container'
+import Box from '@mui/material/Box'
 
 function ModeChoose() {
   const { mode, setMode } = useColorScheme()
@@ -52,41 +50,40 @@ function ModeChoose() {
   )
 }
 
-function ModeToggle() {
-  const { mode, setMode } = useColorScheme()
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  return (
-    <Button
-      onClick={() => {
-        setMode(mode === 'light' ? 'dark' : 'light');
-      }}
-    >
-      {mode === 'light' ? 'Turn dark' : 'Turn light'}
-    </Button>
-  )
-}
 
 function App() {
 
   return (
-    <>
-      <ModeChoose />
-      <hr />
-      <ModeToggle />
-      <hr />
-      <h1>Hello Word</h1>
-      <Typography variant="body2" color="text.secondary">H1</Typography>
-      <Button variant="text">Text</Button>
-      <Button variant="contained">Contained</Button>
-      <Button variant="outlined">Outlined</Button>
-      <br />
-      <HomeIcon />
-      <HomeIcon color="primary" />
-      <HomeIcon color="secondary" />
-      <HomeIcon color="success" />
-      <HomeIcon color="action" />
-      <HomeIcon color="disabled" />
-    </>
+    <Container disableGutters maxWidth={false} sx={{ height: '100vh', backgroundColor: 'primary.main'}}>
+      <Box sx ={{
+        backgroundColor: 'primary.light',
+        width: '100%',
+        height: (theme) => theme.controllCustomer.topBarHeight,
+        display: 'flex',
+        alignItems: 'center',
+      }}>
+        <ModeChoose />
+      </Box>
+      <Box sx={{
+        backgroundColor: 'primary.dark',
+        width: '100%',
+        height: (theme) => theme.controllCustomer.boardBarHeight,
+        display: 'flex',
+        alignItems: 'center',
+      }}>
+        Board Bar
+      </Box>
+      <Box sx={{
+          backgroundColor: 'primary.main',
+          width: '100%',
+          height: (theme) => `calc(100vh - ${theme.controllCustomer.topBarHeight} - ${theme.controllCustomer.boardBarHeight})`,
+          display: 'flex',
+          alignItems: 'center',
+      }}>
+        Box Content
+      </Box>
+      
+    </Container>
   )
 }
 
