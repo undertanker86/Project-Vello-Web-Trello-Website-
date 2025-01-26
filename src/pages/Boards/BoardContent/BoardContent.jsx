@@ -2,7 +2,7 @@ import Box from '@mui/material/Box'
 import * as React from 'react';
 import ListColumns from './ListColumns/ListColumns';
 import { mapOrder } from '../../../utils/sortarraybasearray';
-import { DndContext, useSensor, useSensors, MouseSensor, TouchSensor, DragOverlay,  defaultDropAnimationSideEffects, closestCorners } from '@dnd-kit/core';
+import { DndContext, useSensor, useSensors, MouseSensor, TouchSensor, DragOverlay,  defaultDropAnimationSideEffects, closestCorners, pointerWithin, rectIntersection, getFirstCollision } from '@dnd-kit/core';
 import { arrayMove} from '@dnd-kit/sortable';
 import Column from './ListColumns/Column/Column';
 import VCard from './ListColumns/Column/ListCards/VCard/VCard';
@@ -41,6 +41,8 @@ function BoardContent({board}) {
   const [activeDragItemType, setactiveDragItemType] = React.useState([null]);
   const [activeDragItemData, setactiveDragItemData] = React.useState([null]);
   const [oldColumnDraggingCard, setoldColumnDraggingCard] = React.useState([null]);
+  // Using ref for save last overId in algorithm drag and drop
+  const lastOverId = React.useRef(null);
 
   //  Animation when drop item
   const dropAnimation = {
@@ -217,8 +219,42 @@ function BoardContent({board}) {
     setactiveDragItemType(null);
     setoldColumnDraggingCard(null);
   }
+  // Custom collisionDetectionStrategy
+  const collisionDetectionStrategy = React.useCallback((args) => {
+
+   
+    if(activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN){
+      return closestCorners({ ...args });
+    }
+    // Finding the intersection between the active draggable and the droppable elements
+    const pointerIntersections = pointerWithin(args);
+
+     // If drag column outside column like above or below
+    if(!pointerIntersections?.length){
+      return
+    }
+    // Finding first overId in pointerIntersections
+    let overId = getFirstCollision(pointerIntersections, 'id');
+
+    if(overId){
+      
+      const intersecColumn = orderedColumnsState.find(c => c._id === overId);
+      if(intersecColumn){
+        overId = closestCorners({
+          ...args,
+          droppableContainers: args.droppableContainers.filter(container => { (container.id === overId) && (intersecColumn?.cardOrderIds?.includes(container.id))})
+        })[0]?.id
+      }
+      lastOverId.current = overId;
+      return [{ id: overId}]
+    }
+    // Return lastOverId if have overId is null or empty - Avoid bug
+    return lastOverId.current ? [{ id: lastOverId.current}] : [];
+
+  }, [activeDragItemType, orderedColumnsState]);
   return (
-    <DndContext onDragEnd={handleDragEnd} sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragOver={handleDragOver}>
+    //  if use closestCorners will have bug flickering + not smooth when drag and drop, so customer collisionDetectionStrategy
+    <DndContext onDragEnd={handleDragEnd} sensors={sensors} collisionDetection={collisionDetectionStrategy} onDragStart={handleDragStart} onDragOver={handleDragOver}>
       <Box sx={{
         bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#778ca3' : '#aaa69d' ),
         width: '100%',
