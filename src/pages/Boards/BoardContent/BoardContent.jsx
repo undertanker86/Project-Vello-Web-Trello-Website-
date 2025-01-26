@@ -2,12 +2,12 @@ import Box from '@mui/material/Box'
 import * as React from 'react';
 import ListColumns from './ListColumns/ListColumns';
 import { mapOrder } from '../../../utils/sortarraybasearray';
-import { DndContext, useSensor, useSensors, MouseSensor, TouchSensor, DragOverlay,  defaultDropAnimationSideEffects, closestCorners, pointerWithin, rectIntersection, getFirstCollision } from '@dnd-kit/core';
+import { DndContext, useSensor, useSensors, MouseSensor, TouchSensor, DragOverlay,  defaultDropAnimationSideEffects, closestCorners, pointerWithin, getFirstCollision } from '@dnd-kit/core';
 import { arrayMove} from '@dnd-kit/sortable';
 import Column from './ListColumns/Column/Column';
 import VCard from './ListColumns/Column/ListCards/VCard/VCard';
 import {cloneDeep} from 'lodash'
-
+import { generatePlaceHolderCard } from '../../../utils/generate';
 
 
 const ACTIVE_DRAG_ITEM_TYPE ={
@@ -85,6 +85,13 @@ function BoardContent({board}) {
       if(nextActiveColumn){
         // Delete card in active column by get new array without this card which need delete
           nextActiveColumn.cards = nextActiveColumn.cards.filter(card => card._id !== activeDraggingCardId)
+
+         
+          // Add placeholder card to avoid empty column when last card to move other column 
+         if(nextActiveColumn?.cards?.length === 0){
+            // Add card in column if column is empty  - Avoid empty column
+            nextActiveColumn.cards = [generatePlaceHolderCard(nextActiveColumn)]
+         }
           // Update cardOrderIds to suitable data
           nextActiveColumn.cardOrderIds = nextActiveColumn.cards.map(card => card._id)
       }
@@ -97,8 +104,11 @@ function BoardContent({board}) {
         const rebuildActiveDraggingCardData = {...activeDraggingCardData, columnId: overColumn._id}
         // Add card dragging to overColumn with new index
         nextOverColumn.cards = nextOverColumn.cards.toSpliced(newCardIndex, 0 , rebuildActiveDraggingCardData)
+        
+        // delete placeholder card in overColumn if have - Avoid placeholder card
+        nextOverColumn.cards = nextOverColumn.cards.filter(card => !card.fontEndPlaceholderCard)
+        
         // Update cardOrderIds to suitable data
-
         nextOverColumn.cardOrderIds = nextOverColumn.cards.map(card => card._id)
       }
       console.log('nextColumns', nextColumns);
