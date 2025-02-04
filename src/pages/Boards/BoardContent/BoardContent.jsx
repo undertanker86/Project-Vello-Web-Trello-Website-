@@ -2,7 +2,8 @@ import Box from '@mui/material/Box'
 import * as React from 'react';
 import ListColumns from './ListColumns/ListColumns';
 import { mapOrder } from '../../../utils/sortarraybasearray';
-import { DndContext, useSensor, useSensors, MouseSensor, TouchSensor, DragOverlay,  defaultDropAnimationSideEffects, closestCorners, pointerWithin, getFirstCollision } from '@dnd-kit/core';
+import { DndContext, useSensor, useSensors, DragOverlay,  defaultDropAnimationSideEffects, closestCorners, pointerWithin, getFirstCollision } from '@dnd-kit/core';
+import {MouseSensor, TouchSensor} from '../../../customLibs/DndKitSensors';
 import { arrayMove} from '@dnd-kit/sortable';
 import Column from './ListColumns/Column/Column';
 import VCard from './ListColumns/Column/ListCards/VCard/VCard';
@@ -17,7 +18,7 @@ const ACTIVE_DRAG_ITEM_TYPE ={
 
 
 
-function BoardContent({board}) {
+function BoardContent({board, createNewColumn, createNewCard, moveColumn}) {
   // Using mouse and touch sensor for drag and drop with good experience in mobile and desktop insted of use touch
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
@@ -218,9 +219,11 @@ function BoardContent({board}) {
         // get position from over
         const newColumnPosition = orderedColumnsState.findIndex(c => c._id === over.id);
         const newColumns = arrayMove(orderedColumnsState, oldColumnPosition, newColumnPosition);
+        setorderedColumnsState(newColumns);
+        moveColumn(newColumns);
         // For update new column order if have api
         // const newColumnIds = newColumns.map(c => c._id);
-        setorderedColumnsState(newColumns);
+        
         }
     }
     // Reset active drag item
@@ -272,7 +275,7 @@ function BoardContent({board}) {
         // alignItems: 'center',
         p: '10px 0'
     }}>
-      <ListColumns columns={orderedColumnsState} />
+      <ListColumns columns={orderedColumnsState} createNewColumn = {createNewColumn} createNewCard = {createNewCard} />
       <DragOverlay dropAnimation={dropAnimation}>
         {(!activeDragItemId || !activeDragItemData || !activeDragItemType) && null}
         {(activeDragItemId && activeDragItemData && activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) && <Column column={activeDragItemData}/>}

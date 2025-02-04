@@ -44,11 +44,13 @@ function BoardBar(props) {
       borderButton: '1px solid #e0e0e0',
     }}>
       <Box  sx={{ display: 'flex', alignItems: 'center', gap: 2} }>
-        <Chip 
-        icon={<SpaceDashboardIcon />} label=  {capitalizeFirstLetter(board?.title)}
-        clickable
-        sx={CHIP_STYLE}
-        />
+        <Tooltip title={board?.description}>
+          <Chip 
+          icon={<SpaceDashboardIcon />} label=  {capitalizeFirstLetter(board?.title)}
+          clickable
+          sx={CHIP_STYLE}
+          />
+        </Tooltip>
 
         <Chip 
         icon={<VpnLockIcon />} label= {capitalizeFirstLetter(board?.type)}
