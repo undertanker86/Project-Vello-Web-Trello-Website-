@@ -11,11 +11,21 @@ export const updateBoardDetailsAPI = async (boardId, updateData) => {
   return response.data; 
 }
 
+export const moveCardInDifferentColumnAPI = async (updateData) => {
+  const response = await axios.put(`${API_ROOT_URL}/v1/boards/supports/moving_card`, updateData);
+  return response.data; 
+}
+
 
 export const createNewColumnAPI = async (column) => {
   const response = await axios.post(`${API_ROOT_URL}/v1/columns`, column);
   console.log(response.data);
   return response.data; // This is the newly created column
+}
+
+export const updateColumnDetailsAPI = async (columnId, updateData) => {
+  const response = await axios.put(`${API_ROOT_URL}/v1/columns/${columnId}`, updateData);
+  return response.data; 
 }
 
 export const createNewCardAPI = async (card) => {

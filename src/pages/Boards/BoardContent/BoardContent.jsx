@@ -18,7 +18,7 @@ const ACTIVE_DRAG_ITEM_TYPE ={
 
 
 
-function BoardContent({board, createNewColumn, createNewCard, moveColumn}) {
+function BoardContent({board, createNewColumn, createNewCard, moveColumn, moveCardInSameColumn, moveCardInDifferentColumn}) {
   // Using mouse and touch sensor for drag and drop with good experience in mobile and desktop insted of use touch
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
@@ -66,7 +66,7 @@ function BoardContent({board, createNewColumn, createNewCard, moveColumn}) {
     return orderedColumnsState.find(c => c?.cards?.map(card => card._id)?.includes(cardId));
   }
   // Update state when move card between different columns (General Function)
-  const moveCardBetweenDifferentColumns =(overColumn, overCardId, active, over, activeColumn, activeDraggingCardData, activeDraggingCardId) =>{
+  const moveCardBetweenDifferentColumns =(overColumn, overCardId, active, over, activeColumn, activeDraggingCardData, activeDraggingCardId, triggerFrom) =>{
     setorderedColumnsState( prevColumns => {
       // get index of card is dragging
       const overCardIndex = overColumn?.cards?.findIndex(card => card._id === overCardId);
@@ -112,7 +112,13 @@ function BoardContent({board, createNewColumn, createNewCard, moveColumn}) {
         // Update cardOrderIds to suitable data
         nextOverColumn.cardOrderIds = nextOverColumn.cards.map(card => card._id)
       }
-      console.log('nextColumns', nextColumns);
+
+      // If function trigger from handleDragOver, call API
+      if(triggerFrom === 'handleDragEnd'){
+        moveCardInDifferentColumn(activeDraggingCardId, oldColumnDraggingCard._id, nextOverColumn._id, nextColumns)
+        console.log('Move card between different columns')
+      }
+      // console.log('nextColumns', nextColumns);
       return nextColumns
     })
   }
@@ -156,7 +162,7 @@ function BoardContent({board, createNewColumn, createNewCard, moveColumn}) {
 
     // If drag card not in same column
     if(activeColumn._id !== overColumn._id){
-      moveCardBetweenDifferentColumns(overColumn, overCardId, active, over, activeColumn, activeDraggingCardData, activeDraggingCardId)
+      moveCardBetweenDifferentColumns(overColumn, overCardId, active, over, activeColumn, activeDraggingCardData, activeDraggingCardId, 'handleDragOver')
     }
 
   }
@@ -185,7 +191,7 @@ function BoardContent({board, createNewColumn, createNewCard, moveColumn}) {
       
       // Drag card in different column
       if(oldColumnDraggingCard._id !== overColumn._id){
-        moveCardBetweenDifferentColumns(overColumn, overCardId, active, over, activeColumn, activeDraggingCardData, activeDraggingCardId)
+        moveCardBetweenDifferentColumns(overColumn, overCardId, active, over, activeColumn, activeDraggingCardData, activeDraggingCardId, 'handleDragEnd')
 
       }
       // Drag card in same column
@@ -208,6 +214,8 @@ function BoardContent({board, createNewColumn, createNewCard, moveColumn}) {
           }
           return nextColumns
         })
+
+        moveCardInSameColumn(newCards, newCards.map(card => card._id), oldColumnDraggingCard._id)
       }
 
     }
