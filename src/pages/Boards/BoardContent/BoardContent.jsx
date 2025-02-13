@@ -18,7 +18,7 @@ const ACTIVE_DRAG_ITEM_TYPE ={
 
 
 
-function BoardContent({board, createNewColumn, createNewCard, moveColumn, moveCardInSameColumn, moveCardInDifferentColumn}) {
+function BoardContent({board, moveColumn, moveCardInSameColumn, moveCardInDifferentColumn}) {
   // Using mouse and touch sensor for drag and drop with good experience in mobile and desktop insted of use touch
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
@@ -283,7 +283,7 @@ function BoardContent({board, createNewColumn, createNewCard, moveColumn, moveCa
         // alignItems: 'center',
         p: '10px 0'
     }}>
-      <ListColumns columns={orderedColumnsState} createNewColumn = {createNewColumn} createNewCard = {createNewCard} />
+      <ListColumns columns={orderedColumnsState} />
       <DragOverlay dropAnimation={dropAnimation}>
         {(!activeDragItemId || !activeDragItemData || !activeDragItemType) && null}
         {(activeDragItemId && activeDragItemData && activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN) && <Column column={activeDragItemData}/>}

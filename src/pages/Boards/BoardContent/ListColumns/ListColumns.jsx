@@ -7,8 +7,15 @@ import { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import { toast } from 'react-toastify';
+import { createNewColumnAPI } from '../../../../apis'
+import { generatePlaceHolderCard } from '../../../../utils/generate'
+import { updateCurrentActiveBoard, selectCurrentActiveBoard } from '../../../../redux/activeBoard/activeBoardSlice'
+import {useDispatch, useSelector} from 'react-redux'
+import { cloneDeep } from 'lodash'
 
-function ListColumns({columns, createNewColumn, createNewCard}) {
+function ListColumns({columns}) {
+  const dispatch = useDispatch()
+  const board = useSelector(selectCurrentActiveBoard)
   const [openNewColumnForm, setopenNewColumnForm] = useState(false)
 
   const handleOpenNewColumnForm = () => setopenNewColumnForm(!openNewColumnForm)
@@ -23,7 +30,20 @@ function ListColumns({columns, createNewColumn, createNewCard}) {
     const newColumnData ={
       title: newColumnTitle,
     }
-    await createNewColumn(newColumnData)
+    //  CALL API to create new column and refresh data State Board
+    const createdColumn = await createNewColumnAPI({
+      ...newColumnData,
+      boardId: board._id
+    })
+    createdColumn.cards.push(generatePlaceHolderCard(createdColumn))
+    createdColumn.cardOrderIds.push(generatePlaceHolderCard(createdColumn)._id)
+    // Update board state
+    // const newBoard = {...board} // Shallow Copy/Clone
+    const newBoard = cloneDeep(board) // Deep Clone insted Shallow Clone Because Rule of Immutability
+    //  console.log("newBoard" , newBoard)
+    newBoard.columns.push(createdColumn)
+    newBoard.columnOrderIds.push(createdColumn._id)
+    dispatch(updateCurrentActiveBoard(newBoard))
     // reset form
     handleOpenNewColumnForm()
     setnewColumnTitle('')
@@ -42,7 +62,7 @@ function ListColumns({columns, createNewColumn, createNewCard}) {
       }}>
         {/* react require key for each element in list */}
         {columns?.map((column) => {
-            return (<Column key={column._id} column = {column} createNewCard={createNewCard} />)
+            return (<Column key={column._id} column = {column}  />)
         })}
         
         {/* Add new column */}

@@ -23,7 +23,16 @@ import {useState} from 'react';
 import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import { toast } from 'react-toastify';
-function Column({column, createNewCard}) {
+import { useConfirm } from "material-ui-confirm";
+import { createNewCardAPI, deleteColumnDetailsAPI } from '../../../../../apis'
+import { updateCurrentActiveBoard, selectCurrentActiveBoard } from '../../../../../redux/activeBoard/activeBoardSlice'
+import {useDispatch, useSelector} from 'react-redux'
+import { cloneDeep } from 'lodash'
+
+
+function Column({column}) {
+    const dispatch = useDispatch()
+    const board = useSelector(selectCurrentActiveBoard)
     // Drag and Sort
     const {
       attributes,
@@ -70,11 +79,50 @@ function Column({column, createNewCard}) {
       title: newCardTitle,
       columnId: column._id
     }
-      await createNewCard(newCardData)
+    // CALL API to create new card and refresh data State Board
+    const createdCard = await createNewCardAPI({
+      ...newCardData,
+      boardId: board._id,
+    })
+    const newBoard = cloneDeep(board)
+    const columnToUpdate = newBoard.columns.find(column => column._id === createdCard .columnId)
+    if(columnToUpdate){
+      // If empty column, remove placeholder card
+      if(columnToUpdate.cards.some(card => card.fontEndPlaceholderCard)){
+        columnToUpdate.cards = [createdCard]
+        columnToUpdate.cardOrderIds = [createdCard._id]
+      }
+      else{
+        columnToUpdate.cards.push(createdCard)
+        columnToUpdate.cardOrderIds.push(createdCard._id)
+      }
+      
+    }
+    dispatch(updateCurrentActiveBoard(newBoard))
       // reset form
       // console.log(newCardTitle)
       handleOpenNewCardForm()
       setnewCardTitle('')
+    }
+    const confirm = useConfirm();
+    const handleDeleteColumn = () => {
+      confirm({ 
+        description: `This will delete the column "${column.title}" and all the cards in it. Are you sure?`,
+      },
+      ).then(()=>{
+        // Call API to delete column
+        // Update for suitable stable board
+        const newBoard = cloneDeep(board)
+        //  console.log("newBoard" , newBoard)
+        newBoard.columns = newBoard.columns.filter(c => c._id !== column._id)
+        newBoard.columnOrderIds = newBoard.columnOrderIds.filter(_id => _id !== column._id)
+        dispatch(updateCurrentActiveBoard(newBoard))
+        // CALL API
+        deleteColumnDetailsAPI(column._id).then( res => {
+          // console.log("Delete Column: ", res)
+          toast.success(res?.deleteColumn)
+        })
+        }).catch(()=>{})
     }
   return (
         // {/* Box Column */}
@@ -127,13 +175,19 @@ function Column({column, createNewCard}) {
                   anchorEl={anchorEl}
                   open={open}
                   onClose={handleClose}
+                  onClick={handleClose}
                   MenuListProps={{
                     'aria-labelledby': 'basic-button-column-dropdown',
                   }}
                 >
-                  <MenuItem>
+                  <MenuItem
+                    onClick={handleOpenNewCardForm}
+                    sx={{
+                      '&:hover': {color: 'success.main', '& .LibraryAddIcon': {color: 'success.main'}}
+                    }}
+                  >
                     <ListItemIcon>
-                      <LibraryAddIcon fontSize="small" />
+                      <LibraryAddIcon className="LibraryAddIcon" fontSize="small" />
                     </ListItemIcon>
                     <ListItemText>Add New Card</ListItemText>
                   </MenuItem>
@@ -162,9 +216,14 @@ function Column({column, createNewCard}) {
                     </ListItemIcon>
                     <ListItemText>Save this column</ListItemText>
                   </MenuItem>
-                  <MenuItem>
+                  <MenuItem
+                  onClick={handleDeleteColumn}
+                  sx={{
+                    '&:hover': {color: 'warning.main', '& .DeleteOutlineIcon': {color: 'warning.main'}}
+                  }}
+                  >
                     <ListItemIcon>
-                      <DeleteOutlineIcon fontSize="small" />
+                      <DeleteOutlineIcon className ="DeleteOutlineIcon" fontSize="small" />
                     </ListItemIcon>
                     <ListItemText>Remove this column</ListItemText>
                   </MenuItem>

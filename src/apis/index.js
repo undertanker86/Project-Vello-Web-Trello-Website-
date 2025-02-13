@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { API_ROOT_URL } from '../utils/constants';
-export const fetchBoardDetailsAPI = async (boardId) => {
-  const response = await axios.get(`${API_ROOT_URL}/v1/boards/${boardId}`);
-  console.log(response.data);
-  return response.data; // This is the board details
-}
+// export const fetchBoardDetailsAPI = async (boardId) => {
+//   const response = await axios.get(`${API_ROOT_URL}/v1/boards/${boardId}`);
+//   console.log(response.data);
+//   return response.data; // This is the board details
+// }
 
 export const updateBoardDetailsAPI = async (boardId, updateData) => {
   const response = await axios.put(`${API_ROOT_URL}/v1/boards/${boardId}`, updateData);
@@ -25,6 +25,11 @@ export const createNewColumnAPI = async (column) => {
 
 export const updateColumnDetailsAPI = async (columnId, updateData) => {
   const response = await axios.put(`${API_ROOT_URL}/v1/columns/${columnId}`, updateData);
+  return response.data; 
+}
+
+export const deleteColumnDetailsAPI = async (columnId) => {
+  const response = await axios.delete(`${API_ROOT_URL}/v1/columns/${columnId}`);
   return response.data; 
 }
 
