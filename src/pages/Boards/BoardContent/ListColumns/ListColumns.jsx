@@ -117,6 +117,7 @@ function ListColumns({columns}) {
               gap: 1,
             }}>
               <Button
+                className="interceptor-loading"
                 onClick={handleAddNewColumn}
                 variant="contained"
                 color= "success"

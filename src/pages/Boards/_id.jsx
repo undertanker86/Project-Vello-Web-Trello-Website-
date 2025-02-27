@@ -9,16 +9,22 @@ import Box from '@mui/material/Box'
 import LinearProgress from '@mui/material/LinearProgress';
 import { fetchBoardDetailsAPI, updateCurrentActiveBoard, selectCurrentActiveBoard } from '../../redux/activeBoard/activeBoardSlice'
 import {useDispatch, useSelector} from 'react-redux'
+import { useParams } from 'react-router-dom'
+
+
+
 function Board() {
   // Use State from Redux
   const dispatch = useDispatch()
   // const [board, setBoard] = useState(null)
   const board = useSelector(selectCurrentActiveBoard)
+  // get boardId from URL
+  const { boardId } = useParams()
   useEffect(() => {
-    const boardId = '67a2c279d5b37680a5d597b3'
+    // const boardId = '67a2c279d5b37680a5d597b3'
     // Call API to get data
     dispatch(fetchBoardDetailsAPI(boardId))
-  }, [dispatch])
+  }, [dispatch, boardId])
 
 // CALL API to move column and refresh data State Board
   const moveColumn = async (dndOrderedColumns) =>{

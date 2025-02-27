@@ -285,6 +285,7 @@ function Column({column}) {
                     gap: 1,
                   }}>
                     <Button
+                      className="interceptor-loading"
                       onClick={handleAddNewCard}
                       variant="contained"
                       color= "success"
