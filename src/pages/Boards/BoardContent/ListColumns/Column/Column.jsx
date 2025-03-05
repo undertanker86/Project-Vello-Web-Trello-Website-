@@ -1,5 +1,4 @@
 import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
 import * as React from 'react';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -24,11 +23,11 @@ import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
 import { toast } from 'react-toastify';
 import { useConfirm } from "material-ui-confirm";
-import { createNewCardAPI, deleteColumnDetailsAPI } from '../../../../../apis'
+import { createNewCardAPI, deleteColumnDetailsAPI, updateColumnDetailsAPI } from '../../../../../apis'
 import { updateCurrentActiveBoard, selectCurrentActiveBoard } from '../../../../../redux/activeBoard/activeBoardSlice'
 import {useDispatch, useSelector} from 'react-redux'
 import { cloneDeep } from 'lodash'
-
+import ToggleFocusInput from '../../../../../components/Form/ToggleFocusInput';
 
 function Column({column}) {
     const dispatch = useDispatch()
@@ -107,7 +106,7 @@ function Column({column}) {
     const confirm = useConfirm();
     const handleDeleteColumn = () => {
       confirm({ 
-        description: `This will delete the column "${column.title}" and all the cards in it. Are you sure?`,
+        description: `This will delete the column "${column?.title}" and all the cards in it. Are you sure?`,
       },
       ).then(()=>{
         // Call API to delete column
@@ -123,6 +122,18 @@ function Column({column}) {
           toast.success(res?.deleteColumn)
         })
         }).catch(()=>{})
+    }
+
+    const onUpdateColumnTitle = (newTitle) =>{
+      // Call API to update column title and handle data in redux
+      updateColumnDetailsAPI(column._id, {title: newTitle}).then(() => {
+        const newBoard = cloneDeep(board)
+        const columnToUpdate = newBoard.columns.find(c => column._id === c._id)
+        if(columnToUpdate){
+          columnToUpdate.title = newTitle
+        }
+        dispatch(updateCurrentActiveBoard(newBoard))
+      })
     }
   return (
         // {/* Box Column */}
@@ -151,11 +162,11 @@ function Column({column}) {
               justifyContent: 'space-between',
     
             }}> 
-              <Typography sx={{
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                fontSize: '1.2rem'
-              }}>{column?.title}</Typography>
+              <ToggleFocusInput 
+                value={column?.title}
+                onChangedValue={onUpdateColumnTitle}
+                data-no-dnd="true" // Prevent drag when click
+                />
               <Box>
                 <Tooltip title="More Options">
                   <KeyboardArrowDownIcon

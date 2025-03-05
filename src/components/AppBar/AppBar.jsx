@@ -20,6 +20,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import SearchIcon from '@mui/icons-material/Search';
 import InputAdornment from '@mui/material/InputAdornment';
 import CloseIcon from '@mui/icons-material/Close';
+import { Link } from 'react-router-dom';
 
 function AppBar() {
   const [searchValue, setSearchValue] = useState('');
@@ -35,12 +36,18 @@ function AppBar() {
       bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#4b6584' : '#84817a' )
     }}>
       <Box  sx={{ display: 'flex', alignItems: 'center', gap: 2} }>
-        <MenuIcon sx={{color: 'white'}} />
-        <Box sx={{display: 'flex', alignItems: 'center', gap: 0.5}}>
-        {/* inheritViewBox get scale of file .svg */}
-          <SvgIcon component={velloLogo} inheritViewBox sx={{ color: 'white' }} />
-          <Typography variant='span' sx= {{ fontSize: '1.2rem', fontWeight: 'bold', color: 'white'}}>Vello</Typography>
-        </Box>
+        <Link to= "/">
+          <Tooltip title="Boards List">
+            <MenuIcon sx={{color: 'white', verticalAlign:'middle' }} />
+          </Tooltip>
+        </Link>
+        <Link to ="/">
+          <Box sx={{display: 'flex', alignItems: 'center', gap: 0.5}}>
+          {/* inheritViewBox get scale of file .svg */}
+            <SvgIcon component={velloLogo} inheritViewBox sx={{ color: 'white' }} />
+            <Typography variant='span' sx= {{ fontSize: '1.2rem', fontWeight: 'bold', color: 'white'}}>Vello</Typography>
+          </Box>
+        </Link>
 
         <Box sx={{ display: { xs:'none', md: 'flex' }, gap: 2}}>
           <Workspaces />
