@@ -10,7 +10,12 @@ import ModeCommentIcon from '@mui/icons-material/ModeComment';
 import AttachmentIcon from '@mui/icons-material/Attachment';
 import {useSortable} from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
+import { useDispatch } from 'react-redux';
+import { updateCurrentActiveCard } from '../../../../../../../redux/activeCard/activeCardSlice';
+
 function VCard({card}) {
+  const dispatch = useDispatch();
+
 
   // Drag and Sort
   const {
@@ -31,8 +36,15 @@ function VCard({card}) {
   const showCardAction = () => {
     return !!card?.memberIds?.length || !!card?.comments?.length || !!card?.attachments?.length
   }
+  const setActiveCardToRedux = () => {
+    console.log("Here")
+    // Update data for activeCard in Redux
+    dispatch(updateCurrentActiveCard(card))
+  }
+
   return (
-    <Card 
+    <Card
+      onClick={setActiveCardToRedux} 
       ref={setNodeRef}
       style={dndCardstyle}
       {...attributes} {...listeners}

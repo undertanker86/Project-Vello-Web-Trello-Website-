@@ -5,13 +5,13 @@ import VpnLockIcon from '@mui/icons-material/VpnLock';
 import AddToDriveIcon from '@mui/icons-material/AddToDrive';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import Avatar from '@mui/material/Avatar';
-import AvatarGroup from '@mui/material/AvatarGroup';
+// import Avatar from '@mui/material/Avatar';
+// import AvatarGroup from '@mui/material/AvatarGroup';
 import Tooltip from '@mui/material/Tooltip';
 import Button from '@mui/material/Button';
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import { capitalizeFirstLetter } from '../../../utils/formatcharacters';
-
+import BoardUserGroup from './BoardUserGroup';
 
 const CHIP_STYLE = {
   color: 'white',
@@ -87,23 +87,9 @@ function BoardBar(props) {
             '&:hover': {borderColor: 'white'}
           }}
           >Invite</Button>
-          <AvatarGroup max={4} sx={{'& .MuiAvatar-root': {width: 34, height: 34, fontSize: '16px', gap: '10px', border: 'none', color: 'white', cursor: 'pointer', '&:first-of-type': {bgcolor: '#a4b0de'}}}}>
-            <Tooltip title="Remy Sharp">
-              <Avatar alt="Remy Sharp" src="https://mui.com/static/images/avatar/1.jpg" />
-            </Tooltip>
-            <Tooltip title="Remy Sharp">
-              <Avatar alt="Remy Sharp" src="https://mui.com/static/images/avatar/1.jpg" />
-            </Tooltip>
-            <Tooltip title="Remy Sharp">
-              <Avatar alt="Remy Sharp" src="https://mui.com/static/images/avatar/1.jpg" />
-            </Tooltip>
-            <Tooltip title="Remy Sharp">
-              <Avatar alt="Remy Sharp" src="https://mui.com/static/images/avatar/1.jpg" />
-            </Tooltip>
-            <Tooltip title="Remy Sharp">
-              <Avatar alt="Remy Sharp" src="https://mui.com/static/images/avatar/1.jpg" />
-            </Tooltip>
-          </AvatarGroup>
+           {/* Handle Display Users List of Board */}
+          <BoardUserGroup boardUsers={board?.FE_allUsers}/>
+
       </Box>
     </Box>
   );

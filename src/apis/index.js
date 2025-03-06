@@ -35,6 +35,11 @@ export const createNewCardAPI = async (card) => {
   return response.data; // This is the newly created card
 }
 
+export const updateCardDetailsAPI = async (cardId, updateData) => {
+  const response = await authorizedAxiosInstance.put(`${API_ROOT_URL}/v1/cards/${cardId}`, updateData)
+  return response.data
+}
+
 //  Board
 export const fetchBoardsAPI = async (searchPath) => {
   const response = await authorizedAxiosInstance.get(`${API_ROOT_URL}/v1/boards${searchPath}`)
