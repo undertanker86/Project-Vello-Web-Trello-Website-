@@ -6,8 +6,12 @@ import Popover from '@mui/material/Popover'
 import AddIcon from '@mui/icons-material/Add'
 import Badge from '@mui/material/Badge'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import { useSelector } from 'react-redux'
+import { selectCurrentActiveBoard } from '../../../redux/activeBoard/activeBoardSlice'
+import { CARD_MEMBER_ACTIONS } from '../../../utils/constants'
 
-function CardUserGroup({ cardMemberIds = [] }) {
+
+function CardUserGroup({ cardMemberIds = [], onUpdateCardMembers }) {
   /**
    * Handle Popover to hide or show all users on a popup, similar docs for reference here::
    * https://mui.com/material-ui/react-popover/
@@ -19,17 +23,33 @@ function CardUserGroup({ cardMemberIds = [] }) {
     if (!anchorPopoverElement) setAnchorPopoverElement(event.currentTarget)
     else setAnchorPopoverElement(null)
   }
+  // Get activeBoard from Redux to get all members information of board.
+  const board = useSelector(selectCurrentActiveBoard)
+  // Members of the card is the intersection of the members of the board.
+  // So that base board.FE_allUsers and card.memberIds to create new array to have information of User to display
+ 
+  const FE_CardMembers = board?.FE_allUsers?.filter(user => cardMemberIds.includes(user._id))
 
-  // Note here we do not use MUI's AvatarGroup Component because it does not support well when we need to customize & trigger to process the final calculation element, simply use Box and CSS - Style the Avatar group to standardize the calculation a bit..
+  const handleUpdateCardMembers = (user) => {
+    // incomingMemberInfor to send BE, with 2 infor is userId and action (remove or add user to card)
+    const incomingMemberInfor = {
+      userId: user._id,
+      action: cardMemberIds.includes(user._id) ? CARD_MEMBER_ACTIONS.REMOVE : CARD_MEMBER_ACTIONS.ADD
+    }
+
+    onUpdateCardMembers(incomingMemberInfor)
+  }
+  
+  // Note here  do not use MUI's AvatarGroup Component because it does not support well when we need to customize & trigger to process the final calculation element, simply use Box and CSS - Style the Avatar group to standardize the calculation a bit..
   return (
     <Box sx={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
       {/* Show users who are members of the card*/}
-      {[...Array(8)].map((_, index) =>
-        <Tooltip title="trungquandev" key={index}>
+      {FE_CardMembers.map((user, index) =>
+        <Tooltip title={user.displayName} key={index}>
           <Avatar
             sx={{ width: 34, height: 34, cursor: 'pointer' }}
-            alt="trungquandev"
-            src="https://trungquandev.com/wp-content/uploads/2019/06/trungquandev-cat-avatar.png"
+            alt={user.displayName}
+            src={user.avatar}
           />
         </Tooltip>
       )}
@@ -70,19 +90,24 @@ function CardUserGroup({ cardMemberIds = [] }) {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       >
         <Box sx={{ p: 2, maxWidth: '260px', display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
-          {[...Array(16)].map((_, index) =>
-            <Tooltip title="trungquandev" key={index}>
+          {board?.FE_allUsers.map((user, index) =>
+            <Tooltip title={user.displayName} key={index}>
               {/* How to make Avatar with badge icon: https://mui.com/material-ui/react-avatar/#with-badge */}
               <Badge
                 sx={{ cursor: 'pointer' }}
+                onClick={() => handleUpdateCardMembers(user)}
                 overlap="rectangular"
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                badgeContent={<CheckCircleIcon fontSize="small" sx={{ color: '#27ae60' }} />}
+                badgeContent={
+                  cardMemberIds.includes(user._id) ?
+                <CheckCircleIcon fontSize="small" sx={{ color: '#27ae60' }} /> 
+                : null
+              }
               >
                 <Avatar
                   sx={{ width: 34, height: 34 }}
-                  alt="trungquandev"
-                  src="https://trungquandev.com/wp-content/uploads/2019/06/trungquandev-cat-avatar.png"
+                  alt={user.displayName}
+                  src={user.avatar}
                 />
               </Badge>
             </Tooltip>

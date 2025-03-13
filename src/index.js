@@ -8,6 +8,8 @@ import theme from './theme.js';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+
+
 // Inject Store to axios
 import { injectStore } from './utils/authorizeAxios.js'
 
@@ -22,35 +24,44 @@ import {store} from './redux/store'
 // React Router DOM with BrowserRouter
 import { BrowserRouter } from 'react-router-dom'
 
+
+
 // Config Redux Persist
 import { persistStore } from 'redux-persist'
 import { PersistGate } from 'redux-persist/integration/react'
 const persistor = persistStore(store)
 
+
+
+
+
 // Inject Store to axios
 injectStore(store)
 
 
+
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <BrowserRouter basename='/'>
+
       <Provider store={store}>
         <PersistGate persistor={persistor}>
-          <CssVarsProvider  theme={theme}>
-            <ConfirmProvider defaultOptions={{
-              dialogProps: {maxWidth: 'xs'}
-            }}>
-              <GlobalStyles styles={{
-                a: {
-                  textDecoration: 'none',
-                  color: 'inherit'
-                }
-              }} />
-              <CssBaseline />
-              <App />
-              <ToastContainer theme="colored" position="bottom-left"/>
-            </ConfirmProvider>
-          </CssVarsProvider >
+          <BrowserRouter basename='/'>
+              <CssVarsProvider  theme={theme}>
+                <ConfirmProvider defaultOptions={{
+                  dialogProps: {maxWidth: 'xs'}
+                }}>
+                  <GlobalStyles styles={{
+                    a: {
+                      textDecoration: 'none',
+                      color: 'inherit'
+                    }
+                  }} />
+                  <CssBaseline />
+                  <App />
+                  <ToastContainer theme="colored" position="bottom-left"/>
+                </ConfirmProvider>
+              </CssVarsProvider >
+            </BrowserRouter>
         </PersistGate>
       </Provider>
-    </BrowserRouter>
+
 )

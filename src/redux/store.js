@@ -9,7 +9,7 @@ import { combineReducers } from 'redux' // note that we already have redux in no
 import { persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import { activeCardReducer } from './activeCard/activeCardSlice'
-
+import { notificationsReducer } from './notifications/notificationsSlice'
 
 const rootPersistConfig = {
   key: 'root', // key of the persist we specify, just keep the default as root
@@ -21,7 +21,8 @@ const rootPersistConfig = {
 const reducers = combineReducers({
   activeBoard: activeBoardReducer,
   user: userReducer,
-  activeCard: activeCardReducer
+  activeCard: activeCardReducer,
+  notifications: notificationsReducer
 })
 
 const persistedReducers = persistReducer(rootPersistConfig, reducers)

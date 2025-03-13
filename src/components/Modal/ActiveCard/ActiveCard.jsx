@@ -37,10 +37,13 @@ import CardActivitySection from './CardActivitySection'
 import { styled } from '@mui/material/styles'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { updateCurrentActiveCard, clearAndHideCurrentActiveCard, selectCurrentActiveCard } from '../../../redux/activeCard/activeCardSlice'
+import { updateCurrentActiveCard, clearAndHideCurrentActiveCard, selectCurrentActiveCard, selectIsShowModalActiveCard } from '../../../redux/activeCard/activeCardSlice'
 import { updateCardDetailsAPI } from '../../../apis'
 import { updateCardInBoard } from '../../../redux/activeBoard/activeBoardSlice'
 
+import { selectCurrentUser } from '../../../redux/user/userSlice'
+import { CARD_MEMBER_ACTIONS } from '../../../utils/constants'
+import CardTime from './CardTime' 
 
 const SidebarItem = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -67,7 +70,10 @@ const SidebarItem = styled(Box)(({ theme }) => ({
  */
 function ActiveCard() {
   const dispatch = useDispatch()
+  // const activeCard = useSelector(selectCurrentActiveCard)
   const activeCard = useSelector(selectCurrentActiveCard)
+  const isShowModalActiveCard = useSelector(selectIsShowModalActiveCard)
+  const currentUser = useSelector(selectCurrentUser)
   // Not use State to check open/close model, it will check in Boards/_id.jsx
   // const [isOpen, setIsOpen] = useState(true)
   // const handleOpenModal = () => setIsOpen(true)
@@ -115,10 +121,22 @@ function ActiveCard() {
     )
   }
 
+  const onAddCardComment = async (commentToAdd) =>{
+    await handleApiUpdateCard({ commentToAdd: commentToAdd })
+  }
+
+  const onUpdateCardMembers = async (incomingMemberInfor) => {
+    await handleApiUpdateCard({ incomingMemberInfo: incomingMemberInfor })
+  }
+
+  const onUpdateCardDeadline = async (newDeadline) => {
+    await handleApiUpdateCard({ deadline: newDeadline })
+  }
+
   return (
     <Modal
       disableScrollLock
-      open={true}
+      open={isShowModalActiveCard}
       onClose={handleCloseModal} // Use onClose in case you want to close the Modal by pressing the ESC button or clicking outside the Modal.
       sx={{ overflowY: 'auto' }}>
       <Box sx={{
@@ -170,7 +188,10 @@ function ActiveCard() {
               <Typography sx={{ fontWeight: '600', color: 'primary.main', mb: 1 }}>Members</Typography>
 
               {/* Feature 02: Handling Card Members */}
-              <CardUserGroup />
+              <CardUserGroup 
+                cardMemberIds={activeCard?.memberIds}
+                onUpdateCardMembers={onUpdateCardMembers}
+              />
             </Box>
 
             <Box sx={{ mb: 3 }}>
@@ -193,7 +214,10 @@ function ActiveCard() {
               </Box>
 
               {/* Feature 04: Handle actions, for example commenting on a Card */}
-              <CardActivitySection />
+              <CardActivitySection 
+              cardComments= {activeCard?.comments}
+              onAddCardComment={onAddCardComment}
+              />
             </Box>
           </Grid>
 
@@ -202,16 +226,32 @@ function ActiveCard() {
             <Typography sx={{ fontWeight: '600', color: 'primary.main', mb: 1 }}>Add To Card</Typography>
             <Stack direction="column" spacing={1}>
               {/* Feature 05: Handle user action to join card */}
-              <SidebarItem className="active">
+              {/* If current user logging don't have belong memberIds to show Join button 
+              when Click Join so always is ADD */}
+              {!activeCard?.memberIds?.includes(currentUser?._id) && 
+                <SidebarItem 
+                className="active"
+                onClick={() => onUpdateCardMembers({
+                  _id: currentUser?._id,
+                  action: CARD_MEMBER_ACTIONS.ADD
+                })}
+                >
                 <PersonOutlineOutlinedIcon fontSize="small" />
                 Join
               </SidebarItem>
+              }
+
               {/* Feature 06: Handle Card Cover Image Update Action */}
               <SidebarItem className="active" component="label">
                 <ImageOutlinedIcon fontSize="small" />
                 Cover
                 <VisuallyHiddenInput type="file" onChange={onUploadCardCover} />
               </SidebarItem>
+
+                  {/* NEW: Add Deadline Feature */}
+              <CardTime 
+                onUpdateCardDeadline = {onUpdateCardDeadline}
+                cardDeadline={activeCard?.deadline} />
 
               <SidebarItem><AttachFileOutlinedIcon fontSize="small" />Attachment</SidebarItem>
               <SidebarItem><LocalOfferOutlinedIcon fontSize="small" />Labels</SidebarItem>

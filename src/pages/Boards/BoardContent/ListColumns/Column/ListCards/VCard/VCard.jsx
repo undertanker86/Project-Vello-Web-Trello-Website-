@@ -11,11 +11,17 @@ import AttachmentIcon from '@mui/icons-material/Attachment';
 import {useSortable} from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
 import { useDispatch } from 'react-redux';
-import { updateCurrentActiveCard } from '../../../../../../../redux/activeCard/activeCardSlice';
+import { updateCurrentActiveCard, showModalActiveCard } from '../../../../../../../redux/activeCard/activeCardSlice';
 
 function VCard({card}) {
   const dispatch = useDispatch();
+  const isExpired = card.deadline && new Date(card.deadline) < new Date();
 
+
+  const cardStyle = {
+    backgroundColor: isExpired ? '#ffcccc' : 'white',
+    border: isExpired ? '2px solid red' : '1px solid transparent'
+  };
 
   // Drag and Sort
   const {
@@ -40,13 +46,15 @@ function VCard({card}) {
     console.log("Here")
     // Update data for activeCard in Redux
     dispatch(updateCurrentActiveCard(card))
+    // Show Modal Active Card
+    dispatch(showModalActiveCard())
   }
 
   return (
     <Card
       onClick={setActiveCardToRedux} 
       ref={setNodeRef}
-      style={dndCardstyle}
+      style={{ ...dndCardstyle, ...cardStyle }}
       {...attributes} {...listeners}
       sx={{ 
         cursor: 'pointer',

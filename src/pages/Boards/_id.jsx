@@ -11,15 +11,12 @@ import { fetchBoardDetailsAPI, updateCurrentActiveBoard, selectCurrentActiveBoar
 import {useDispatch, useSelector} from 'react-redux'
 import { useParams } from 'react-router-dom'
 import ActiveCard from '../../components/Modal/ActiveCard/ActiveCard'
-import { selectCurrentActiveCard } from '../../redux/activeCard/activeCardSlice'
 
 function Board() {
   // Use State from Redux
   const dispatch = useDispatch()
   // const [board, setBoard] = useState(null)
   const board = useSelector(selectCurrentActiveBoard)
-  // data activeCard save in Redux
-  const activeCard = useSelector(selectCurrentActiveCard)
   // get boardId from URL
   const { boardId } = useParams()
   useEffect(() => {
@@ -88,7 +85,7 @@ function Board() {
   return (
     <Container disableGutters maxWidth={false} sx={{ height: '100vh'}}>
       {/* Modal Active Card, check close/open base the condition in data activeCard save in Redux, if have to render, In each moment only have Modal Card active */}
-      { activeCard && <ActiveCard/> }
+      <ActiveCard/>
       {/* Rest Component of Board Details */}
       <AppBar />
       {/* Using Optional chaining operator to prevent error when board is null or undefined */}

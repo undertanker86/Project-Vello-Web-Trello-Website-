@@ -5,13 +5,11 @@ import VpnLockIcon from '@mui/icons-material/VpnLock';
 import AddToDriveIcon from '@mui/icons-material/AddToDrive';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import FilterListIcon from '@mui/icons-material/FilterList';
-// import Avatar from '@mui/material/Avatar';
-// import AvatarGroup from '@mui/material/AvatarGroup';
 import Tooltip from '@mui/material/Tooltip';
-import Button from '@mui/material/Button';
-import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import { capitalizeFirstLetter } from '../../../utils/formatcharacters';
 import BoardUserGroup from './BoardUserGroup';
+import InviteBoardUser from './InviteBoardUser';
+
 
 const CHIP_STYLE = {
   color: 'white',
@@ -78,15 +76,8 @@ function BoardBar(props) {
         />
       </Box>
       <Box  sx={{ display: 'flex', alignItems: 'center', gap: 2} }>
-          <Button 
-          variant="outlined" 
-          startIcon={<PersonAddAlt1Icon/>}
-          sx={{
-            color: 'white',
-            borderColor: 'white',
-            '&:hover': {borderColor: 'white'}
-          }}
-          >Invite</Button>
+        {/* Handle Invite user to members of board */}
+          <InviteBoardUser boardId={board?._id}/>
            {/* Handle Display Users List of Board */}
           <BoardUserGroup boardUsers={board?.FE_allUsers}/>
 
